@@ -3,240 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>김엄마 관리형 독서실 - 질의응답 선생님 안내</title>
+    <title>김엄마 관리형 독서실 - 질의응답 안내</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=Black+Han+Sans&display=swap');
-        :root {
-            --online: #059669; --offline: #7c3aed; --accent: #f59e0b;
-            --text: #1e293b; --text-mid: #475569; --text-light: #94a3b8;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; }
+        body { background: #0f172a; display: flex; justify-content: center; align-items: center; }
+        .slideshow { width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; }
+        .slide {
+            display: none; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
+            opacity: 0; transition: opacity 1.2s ease;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html, body { width:100%; height:100%; overflow:hidden; font-family:'Noto Sans KR',sans-serif; }
-        body { background:#0f172a; }
-        .slideshow { width:100%; height:100%; position:relative; }
-
-        .slide { display:none; position:absolute; inset:0; opacity:0; transition:opacity 1.2s ease; flex-direction:column; }
-        .slide.active { display:flex; opacity:1; }
-        .slide.fade-out { display:flex; opacity:0; }
-
-        /* ── 타이틀 슬라이드 ── */
-        .slide-title {
-            background: linear-gradient(180deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
-            justify-content:center; align-items:center; text-align:center; gap:4vh;
-        }
-        .slide-title::before {
-            content:''; position:absolute; inset:0;
-            background:
-                radial-gradient(circle at 30% 25%, rgba(5,150,105,0.18) 0%, transparent 50%),
-                radial-gradient(circle at 70% 75%, rgba(124,58,237,0.18) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(245,158,11,0.1) 0%, transparent 40%);
-            pointer-events:none;
-        }
-        .title-badge {
-            background:linear-gradient(135deg,var(--accent),#f97316); color:#fff;
-            font-size:3.5vh; font-weight:800; padding:1.5vh 5vh; border-radius:50px;
-            letter-spacing:4px; position:relative; z-index:1;
-            box-shadow:0 8px 32px rgba(245,158,11,0.3);
-        }
-        .title-main {
-            font-family:'Black Han Sans',sans-serif; font-size:8vh; color:#fff;
-            position:relative; z-index:1; line-height:1.3;
-        }
-        .title-sub { font-size:3vh; color:rgba(255,255,255,0.65); position:relative; z-index:1; }
-        .title-divider { width:60%; height:2px; background:linear-gradient(90deg,transparent,rgba(245,158,11,0.4),transparent); position:relative; z-index:1; }
-        .title-stats { display:flex; gap:4vh; position:relative; z-index:1; flex-direction:column; align-items:center; }
-        .stat-row { display:flex; gap:3vh; }
-        .stat-item {
-            display:flex; align-items:center; gap:1.5vh;
-            padding:2vh 3.5vh; border-radius:16px; font-size:2.8vh; font-weight:600;
-        }
-        .stat-item.on { background:rgba(5,150,105,0.15); color:#6ee7b7; border:1px solid rgba(5,150,105,0.25); }
-        .stat-item.off { background:rgba(124,58,237,0.15); color:#c4b5fd; border:1px solid rgba(124,58,237,0.25); }
-        .stat-dot { width:1.4vh; height:1.4vh; border-radius:50%; animation:pulse 2s infinite; }
-        .stat-item.on .stat-dot { background:#34d399; }
-        .stat-item.off .stat-dot { background:#a78bfa; }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
-
-        /* ── 카드 슬라이드 ── */
-        .slide-cards { padding:0; }
-
-        .section-bar {
-            padding:2.5vh 4vh; display:flex; align-items:center; gap:2vh; flex-shrink:0;
-        }
-        .section-bar.online { background:linear-gradient(90deg,var(--online),#10b981); }
-        .section-bar.offline { background:linear-gradient(90deg,var(--offline),#8b5cf6); }
-        .section-bar .icon { font-size:4vh; }
-        .section-bar .label { font-size:3.5vh; font-weight:800; color:#fff; letter-spacing:2px; }
-        .section-bar .pg { margin-left:auto; font-size:2.2vh; color:rgba(255,255,255,0.8); font-weight:500; }
-
-        .cards-wrap {
-            flex:1; display:flex; flex-direction:column;
-            gap:2.5vh; padding:3vh 3.5vh;
-            background:linear-gradient(180deg,#f8fafc,#f1f5f9);
-            overflow:hidden;
-        }
-
-        .card {
-            flex:1; background:#fff; border-radius:20px; padding:3vh 3.5vh;
-            display:flex; flex-direction:column; justify-content:center;
-            box-shadow:0 2px 16px rgba(0,0,0,0.05); border:1px solid #e2e8f0;
-            position:relative; overflow:hidden;
-        }
-        .card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; }
-        .card.on-c::before { background:linear-gradient(90deg,var(--online),#34d399); }
-        .card.off-c::before { background:linear-gradient(90deg,var(--offline),#a78bfa); }
-
-        .card-header { display:flex; gap:2.5vh; align-items:center; margin-bottom:1.5vh; }
-
-        .avatar {
-            width:12vh; height:12vh; border-radius:50%; overflow:hidden;
-            flex-shrink:0; border:3px solid #f1f5f9; box-shadow:0 3px 10px rgba(0,0,0,0.08);
-        }
-        .avatar img { width:100%; height:100%; object-fit:cover; }
-        .avatar-init {
-            width:12vh; height:12vh; border-radius:50%;
-            display:flex; justify-content:center; align-items:center;
-            font-size:5vh; font-weight:800; flex-shrink:0; border:3px solid #f1f5f9;
-        }
-        .avatar-init.on-a { background:linear-gradient(135deg,#d1fae5,#a7f3d0); color:var(--online); }
-        .avatar-init.off-a { background:linear-gradient(135deg,#ede9fe,#ddd6fe); color:var(--offline); }
-
-        .card-meta { flex:1; }
-        .card-name {
-            font-size:3.8vh; font-weight:800; color:var(--text);
-            display:flex; align-items:center; gap:1.2vh; margin-bottom:0.5vh;
-        }
-        .badge-n {
-            font-size:1.8vh; font-weight:700;
-            background:linear-gradient(135deg,#fef3c7,#fde68a); color:#92400e;
-            padding:0.4vh 1.2vh; border-radius:6px;
-        }
-        .card-school { font-size:2.2vh; color:var(--text-mid); line-height:1.5; margin-bottom:1.2vh; }
-        .tags { display:flex; gap:1vh; flex-wrap:wrap; }
-        .tag { font-size:2vh; font-weight:600; padding:0.6vh 1.6vh; border-radius:8px; }
-        .tag-kr { background:#fef3c7; color:#92400e; }
-        .tag-en { background:#dbeafe; color:#1e40af; }
-        .tag-ma { background:#ede9fe; color:#581c87; }
-        .tag-sc { background:#d1fae5; color:#065f46; }
-        .tag-so { background:#fce7f3; color:#9d174d; }
-
-        .card-desc {
-            font-size:2.3vh; line-height:1.7; color:var(--text-mid); margin-top:1.5vh;
-        }
-        .card-desc strong { color:var(--text); font-weight:700; }
-
-        /* ── 하단 UI ── */
+        .slide.active { display: flex; opacity: 1; justify-content: center; align-items: center; }
+        .slide.fade-out { display: flex; opacity: 0; }
+        .slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .progress-bar {
-            position:absolute; bottom:0; left:0; height:0.6vh;
-            background:linear-gradient(90deg,var(--accent),#f97316);
-            width:0%; z-index:100;
+            position: absolute; bottom: 0; left: 0; height: 5px;
+            background: linear-gradient(90deg, #f59e0b, #f97316);
+            width: 0%; z-index: 100;
         }
         .indicators {
-            position:absolute; bottom:2vh; left:50%; transform:translateX(-50%);
-            display:flex; gap:1.2vh; z-index:100;
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 100;
         }
         .ind {
-            width:1.4vh; height:1.4vh; border-radius:50%;
-            background:rgba(255,255,255,0.2); cursor:pointer; transition:all 0.3s;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); cursor: pointer; transition: all 0.3s;
         }
-        .ind.active { background:var(--accent); transform:scale(1.3); box-shadow:0 0 8px rgba(245,158,11,0.5); }
-        .counter {
-            position:absolute; top:1.5vh; right:3vh;
-            font-size:2vh; color:rgba(255,255,255,0.5); z-index:100; font-weight:500;
-        }
-        .logo {
-            position:absolute; bottom:1.5vh; right:3vh;
-            font-size:1.6vh; color:rgba(255,255,255,0.25); z-index:100;
+        .ind.active {
+            background: #f59e0b; transform: scale(1.3);
+            box-shadow: 0 0 8px rgba(245,158,11,0.5);
         }
     </style>
 </head>
 <body>
-<div class="slideshow">
-
-    <!-- 0: 타이틀 -->
-    <div class="slide slide-title active" data-duration="10000">
-        <div class="title-badge">2026 봄학기</div>
-        <div class="title-main">질의응답<br>선생님 안내</div>
-        <div class="title-sub">김엄마 관리형 독서실이 엄선한<br>최고의 멘토진을 소개합니다</div>
-        <div class="title-divider"></div>
-        <div class="title-stats">
-            <div class="stat-row">
-                <div class="stat-item on"><span class="stat-dot"></span>온라인 질의응답 9명</div>
-            </div>
-            <div class="stat-row">
-                <div class="stat-item off"><span class="stat-dot"></span>대면 질의응답 5명</div>
-            </div>
-        </div>
+    <div class="slideshow">
+        <div class="slide active"><img src="slide1.png" alt="타이틀"></div>
+        <div class="slide"><img src="slide2.png" alt="온라인 1/3"></div>
+        <div class="slide"><img src="slide3.png" alt="온라인 2/3"></div>
+        <div class="slide"><img src="slide4.png" alt="온라인 3/3"></div>
+        <div class="slide"><img src="slide5.png" alt="대면 1/2"></div>
+        <div class="slide"><img src="slide6.png" alt="대면 2/2"></div>
+        <div class="progress-bar" id="pb"></div>
+        <div class="indicators" id="ind"></div>
     </div>
-
-    <!-- 1: 온라인 1~3 -->
-    <div class="slide slide-cards" data-duration="12000">
-        <div class="section-bar online"><span class="icon">💻</span><span class="label">온라인 질의응답</span><span class="pg">1 / 3</span></div>
-        <div class="cards-wrap">
-            <div class="card on-c"><div class="card-header"><div class="avatar"><img src="photos/j.png"></div><div class="card-meta"><div class="card-name">정민희</div><div class="card-school">現 김엄마관리형독서실 원장</div><div class="tags"><span class="tag tag-kr">국어</span></div></div></div><div class="card-desc">15년 경력 국어 전문가. 학생 개개인의 수준에 맞춘 <strong>1:1 맞춤형 질의응답</strong>을 제공합니다.</div></div>
-            <div class="card on-c"><div class="card-header"><div class="avatar"><img src="photos/as.png"></div><div class="card-meta"><div class="card-name">안소윤</div><div class="card-school">인천포스코고 졸업 · 고려대학교 국어국문학과 재학</div><div class="tags"><span class="tag tag-kr">국어</span></div></div></div><div class="card-desc">수시·정시를 모두 경험한 입시 전문가. <strong>국어 내신과 수능</strong>을 동시에 잡는 전략을 제시합니다.</div></div>
-            <div class="card on-c"><div class="card-header"><div class="avatar"><img src="photos/baek.png"></div><div class="card-meta"><div class="card-name">백효찬</div><div class="card-school"></div><div class="tags"><span class="tag tag-so">사회·문화</span><span class="tag tag-so">생활과윤리</span></div></div></div><div class="card-desc">내신 <strong>2.78→수능 1.4</strong> 달성 / 과탐→사탐 전환 후 <strong>두 과목 1등급</strong> / 수시→정시 전환 경험 전달</div></div>
-        </div>
-    </div>
-
-    <!-- 2: 온라인 4~6 -->
-    <div class="slide slide-cards" data-duration="12000">
-        <div class="section-bar online"><span class="icon">💻</span><span class="label">온라인 질의응답</span><span class="pg">2 / 3</span></div>
-        <div class="cards-wrap">
-            <div class="card on-c"><div class="card-header"><div class="avatar"><img src="photos/park.png"></div><div class="card-meta"><div class="card-name">박세영</div><div class="card-school">과학고 조기졸업 · 카이스트(KAIST) 재학</div><div class="tags"><span class="tag tag-ma">수학</span><span class="tag tag-sc">화학</span><span class="tag tag-sc">물리</span></div></div></div><div class="card-desc">과학고 조기졸업 경험을 바탕으로 <strong>수학 및 과학</strong> 문제 풀이 전략을 중심으로 질의응답합니다.</div></div>
-            <div class="card on-c"><div class="card-header"><div class="avatar"><img src="photos/leetaeho.png"></div><div class="card-meta"><div class="card-name">이태호</div><div class="card-school">분당보평고 졸업 · 한양대학교 의과대학 재학</div><div class="tags"><span class="tag tag-ma">수학</span><span class="tag tag-sc">생명과학</span></div></div></div><div class="card-desc">2026 수능 <strong>수학 100점</strong>, 생명과학1 <strong>백분위 99</strong>. 실전 문제 풀이 중점 멘토링 진행.</div></div>
-            <div class="card on-c"><div class="card-header"><div class="avatar"><img src="photos/kimminji.png"></div><div class="card-meta"><div class="card-name">김민지</div><div class="card-school">박문여고 졸업 · 이화여자대학교 재학</div><div class="tags"><span class="tag tag-so">사회·문화</span><span class="tag tag-so">정치와법</span><span class="tag tag-so">생활과윤리</span></div></div></div><div class="card-desc">순수 독학 <strong>내신 1점대</strong> / 사문·정법·생윤 <strong>1등급</strong>(98,95,100) / 국어 <strong>3→1</strong> 향상</div></div>
-        </div>
-    </div>
-
-    <!-- 3: 온라인 7~9 -->
-    <div class="slide slide-cards" data-duration="12000">
-        <div class="section-bar online"><span class="icon">💻</span><span class="label">온라인 질의응답</span><span class="pg">3 / 3</span></div>
-        <div class="cards-wrap">
-            <div class="card on-c"><div class="card-header"><div class="avatar-init on-a">유</div><div class="card-meta"><div class="card-name">유신화</div><div class="card-school">인천포스코고 졸업 · 고려대학교 반도체공학과 재학</div><div class="tags"><span class="tag tag-ma">수학(미적분)</span></div></div></div><div class="card-desc">2024 수능 수학(미적분) <strong>백분위 98</strong>. 꾸준한 우상향 내신으로 <strong>성적 상승 전략</strong>을 지도합니다.</div></div>
-            <div class="card on-c"><div class="card-header"><div class="avatar"><img src="photos/i.png"></div><div class="card-meta"><div class="card-name">임건우</div><div class="card-school">인천포스코고 졸업 · 인하대학교 의과대학 재학</div><div class="tags"><span class="tag tag-ma">수학</span></div></div></div><div class="card-desc">정시 현역 서울대 입학 후 재수하여 <strong>인하대 의대 진학</strong>. 수시·정시 병행 경험으로 다양한 조언 가능.</div></div>
-            <div class="card on-c"><div class="card-header"><div class="avatar-init on-a">최</div><div class="card-meta"><div class="card-name">최은호</div><div class="card-school">인천포스코고 9기 문과 수석 졸업 · 연세대학교 재학</div><div class="tags"><span class="tag tag-kr">국어</span><span class="tag tag-kr">언매</span><span class="tag tag-en">영어</span><span class="tag tag-so">경제</span><span class="tag tag-so">정치와법</span></div></div></div><div class="card-desc">6·9 모의고사 및 수능 <strong>국어 1등급</strong>. 포스코고 <strong>문과 수석</strong>의 내신+수능 동시 전략 안내.</div></div>
-        </div>
-    </div>
-
-    <!-- 4: 대면 1~3 -->
-    <div class="slide slide-cards" data-duration="12000">
-        <div class="section-bar offline"><span class="icon">🤝</span><span class="label">대면 질의응답</span><span class="pg">1 / 2</span></div>
-        <div class="cards-wrap">
-            <div class="card off-c"><div class="card-header"><div class="avatar"><img src="photos/i.png"></div><div class="card-meta"><div class="card-name">임건우 <span class="badge-n">N수생</span></div><div class="card-school">인천포스코고 졸업 · 인하대학교 의과대학 재학</div><div class="tags"><span class="tag tag-ma">수학</span></div></div></div><div class="card-desc">정시 현역 서울대 입학 후 재수하여 <strong>인하대 의대 진학</strong>. 수시·정시 병행 경험으로 다양한 조언 가능.</div></div>
-            <div class="card off-c"><div class="card-header"><div class="avatar"><img src="photos/35.jpg"></div><div class="card-meta"><div class="card-name">박시원 <span class="badge-n">N수생</span></div><div class="card-school">인천포스코고 졸업 · 서울대학교 물리학과 재학</div><div class="tags"><span class="tag tag-ma">수학</span></div></div></div><div class="card-desc">수학 올림피아드 출신. <strong>심화 수학</strong> 문제 풀이와 개념 정리를 도와드립니다.</div></div>
-            <div class="card off-c"><div class="card-header"><div class="avatar"><img src="photos/j.png"></div><div class="card-meta"><div class="card-name">정민희</div><div class="card-school">現 김엄마관리형독서실 원장</div><div class="tags"><span class="tag tag-kr">국어</span></div></div></div><div class="card-desc">15년 경력 국어 전문가. 학생 개개인의 수준에 맞춘 <strong>1:1 맞춤형 질의응답</strong>을 제공합니다.</div></div>
-        </div>
-    </div>
-
-    <!-- 5: 대면 4~5 -->
-    <div class="slide slide-cards" data-duration="12000">
-        <div class="section-bar offline"><span class="icon">🤝</span><span class="label">대면 질의응답</span><span class="pg">2 / 2</span></div>
-        <div class="cards-wrap">
-            <div class="card off-c"><div class="card-header"><div class="avatar"><img src="photos/namhyunsu.png"></div><div class="card-meta"><div class="card-name">남현수</div><div class="card-school">영어영문학 전공 · 호주 Uni. of Canberra<br>Macquarie Uni. 통번역대학원 수료</div><div class="tags"><span class="tag tag-en">영어</span></div></div></div><div class="card-desc">현) 수리딩어학원 <strong>10년차 대표강사</strong>. <strong>25년의 내공</strong>, 결과로 증명하는 압도적 강의. 대원외고·대일외고 등 20년 이상 전문 과외.</div></div>
-            <div class="card off-c"><div class="card-header"><div class="avatar-init off-a">유</div><div class="card-meta"><div class="card-name">유신화 <span class="badge-n">N수생</span></div><div class="card-school">인천포스코고 졸업 · 고려대학교 반도체공학과 재학</div><div class="tags"><span class="tag tag-ma">수학</span></div></div></div><div class="card-desc">2024 수능 수학(미적분) <strong>백분위 98</strong>. 꾸준한 우상향 내신으로 <strong>성적 상승 전략</strong>을 지도합니다.</div></div>
-            <div class="card off-c" style="visibility:hidden"><div class="card-header"><div class="avatar-init off-a">&nbsp;</div><div class="card-meta"><div class="card-name">&nbsp;</div></div></div></div>
-        </div>
-    </div>
-
-    <div class="progress-bar" id="pb"></div>
-    <div class="indicators" id="ind"></div>
-    <div class="counter" id="ct"></div>
-    <div class="logo">www.kmsongdo.store</div>
-</div>
-
-<script>
-const S=document.querySelectorAll('.slide'),ind=document.getElementById('ind'),
-ct=document.getElementById('ct'),pb=document.getElementById('pb'),T=S.length;
-let c=0,tm=null;
-S.forEach((_,i)=>{const d=document.createElement('div');d.className='ind'+(i===0?' active':'');d.onclick=()=>go(i);ind.appendChild(d)});
-function dur(i){return parseInt(S[i].dataset.duration)||10000}
-function show(n){const p=c;c=((n%T)+T)%T;S[p].classList.add('fade-out');S[p].classList.remove('active');setTimeout(()=>S[p].classList.remove('fade-out'),100);S[c].classList.add('active');document.querySelectorAll('.ind').forEach((d,i)=>d.classList.toggle('active',i===c));ct.textContent=(c+1)+' / '+T;prog()}
-function prog(){const d=dur(c);pb.style.transition='none';pb.style.width='0%';requestAnimationFrame(()=>{pb.style.transition='width '+d+'ms linear';pb.style.width='100%'});clearTimeout(tm);tm=setTimeout(()=>show(c+1),d)}
-function go(n){clearTimeout(tm);show(n)}
-document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(c+1)}if(e.key==='ArrowLeft')go(c-1)});
-let tx=0;document.addEventListener('touchstart',e=>tx=e.changedTouches[0].screenY);document.addEventListener('touchend',e=>{const d=e.changedTouches[0].screenY-tx;if(d<-50)go(c+1);if(d>50)go(c-1)});
-ct.textContent='1 / '+T;prog();
-</script>
+    <script>
+        const S=document.querySelectorAll('.slide'), ind=document.getElementById('ind'),
+              pb=document.getElementById('pb'), T=S.length, DUR=10000;
+        let c=0, tm=null;
+        S.forEach((_,i)=>{const d=document.createElement('div');d.className='ind'+(i===0?' active':'');d.onclick=()=>go(i);ind.appendChild(d)});
+        function show(n){const p=c;c=((n%T)+T)%T;S[p].classList.add('fade-out');S[p].classList.remove('active');setTimeout(()=>S[p].classList.remove('fade-out'),100);S[c].classList.add('active');document.querySelectorAll('.ind').forEach((d,i)=>d.classList.toggle('active',i===c));prog()}
+        function prog(){pb.style.transition='none';pb.style.width='0%';requestAnimationFrame(()=>{pb.style.transition='width '+DUR+'ms linear';pb.style.width='100%'});clearTimeout(tm);tm=setTimeout(()=>show(c+1),DUR)}
+        function go(n){clearTimeout(tm);show(n)}
+        document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(c+1)}if(e.key==='ArrowLeft')go(c-1)});
+        let tx=0;document.addEventListener('touchstart',e=>tx=e.changedTouches[0].screenY);
+        document.addEventListener('touchend',e=>{const d=e.changedTouches[0].screenY-tx;if(d<-50)go(c+1);if(d>50)go(c-1)});
+        prog();
+    </script>
 </body>
 </html>
