@@ -1,0 +1,110 @@
+# =====================================================================
+#  파일 위치 : .github/workflows/news.yml
+#  하는 일   : 매일 새벽 3시 40분(한국시간)에 구글 뉴스에서 수능 관련
+#              기사를 받아 news.json 으로 저장 → 7층 패널이 읽어감
+#  준비물    : 없음. API 키도 Secrets 등록도 필요 없습니다.
+# =====================================================================
+name: 수능 뉴스 수집
+
+on:
+  schedule:
+    - cron: '40 18 * * *'      # UTC 18:40 = 한국시간 새벽 3시 40분
+  workflow_dispatch:            # 버튼으로 직접 실행도 가능
+
+permissions:
+  contents: write
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 뉴스 받아오기
+        run: |
+          node <<'JS'
+          const fs = require('fs');
+
+          // 검색어 : 필요하면 이 줄만 고치세요
+          const QUERIES = ['수능', '대학수학능력시험', '수능 모의평가'];
+
+          const decode = s => s
+            .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+            .replace(/<[^>]*>/g, '')
+            .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'")
+            .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+            .replace(/\s+/g, ' ').trim();
+
+          const pick = (block, tag) => {
+            const m = block.match(new RegExp('<' + tag + '[^>]*>([\\s\\S]*?)<\\/' + tag + '>'));
+            return m ? decode(m[1]) : '';
+          };
+
+          (async () => {
+            const seen = new Set();
+            const items = [];
+
+            for (const q of QUERIES) {
+              const url = 'https://news.google.com/rss/search?q=' +
+                          encodeURIComponent(q + ' when:7d') +
+                          '&hl=ko&gl=KR&ceid=KR:ko';
+              let xml = '';
+              try {
+                const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+                if (!res.ok) { console.log(q, '실패', res.status); continue; }
+                xml = await res.text();
+              } catch (e) { console.log(q, '오류', e.message); continue; }
+
+              const blocks = xml.match(/<item>[\s\S]*?<\/item>/g) || [];
+              for (const b of blocks) {
+                let title  = pick(b, 'title');
+                const src  = pick(b, 'source');
+                const pub  = pick(b, 'pubDate');
+
+                // "제목 - 언론사" 형태에서 뒤쪽 언론사 떼기
+                if (src && title.endsWith(' - ' + src)) {
+                  title = title.slice(0, -(src.length + 3)).trim();
+                }
+
+                // 수능과 무관하거나 너무 긴 제목은 제외
+                if (!/수능|정시|수시|모의평가|등급컷|대학수학능력|학평|내신/.test(title)) continue;
+                if (title.length > 42 || title.length < 8) continue;
+
+                const key = title.replace(/\s/g, '');
+                if (seen.has(key)) continue;
+                seen.add(key);
+
+                const d = new Date(pub);
+                const ok = !isNaN(d.getTime());
+                items.push({
+                  title,
+                  source: src || '뉴스',
+                  date: ok ? (d.getMonth() + 1) + '월 ' + d.getDate() + '일' : '',
+                  ts: ok ? d.getTime() : 0
+                });
+              }
+            }
+
+            items.sort((a, b) => b.ts - a.ts);
+            const top = items.slice(0, 6).map(({ ts, ...r }) => r);
+
+            if (!top.length) { console.log('수집된 기사가 없어 기존 파일을 유지합니다'); return; }
+
+            const now = new Date(Date.now() + 9 * 3600 * 1000);   // 한국시간
+            const out = {
+              updated: now.getFullYear() + '. ' + (now.getMonth() + 1) + '. ' + now.getDate(),
+              items: top
+            };
+            fs.writeFileSync('news.json', JSON.stringify(out, null, 2) + '\n');
+            console.log('저장 완료 :', top.length, '건');
+            top.forEach(t => console.log(' -', t.title, '/', t.source));
+          })();
+          JS
+
+      - name: 저장소에 반영
+        run: |
+          git config user.name  "github-actions"
+          git config user.email "actions@github.com"
+          git add news.json
+          git diff --staged --quiet || git commit -m "update news.json"
+          git push
