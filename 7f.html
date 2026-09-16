@@ -6,9 +6,9 @@
 <title>김엄마 관리형독서실 송도점 · 7층 안내 (가로형)</title>
 <style>
   /* =====================================================================
-     7층 가로형 패널 v2  (1920 x 1080 / 32인치)
+     7층 가로형 패널 v4  (1920 x 1080 / 32인치)
      구조 : 왼쪽 고정 띠(D-day · 시계) + 오른쪽 회전 내용
-     크기 : 모두 화면 높이(vh) 기준 → 해상도가 달라도 비율 유지
+     v4  : 첫 화면 + 수능하루 광고만 (기존 01~04 · 뉴스 삭제)
      ===================================================================== */
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{width:100%;height:100%;overflow:hidden;background:#16233F;cursor:none;}
@@ -40,12 +40,14 @@
   .rfoot b{color:#fff;font-weight:800;}
 
   /* ================= 오른쪽 회전 영역 ================= */
-  .stage{width:69%;height:100%;position:relative;overflow:hidden;}
-  .slide{display:none;width:100%;height:100%;position:absolute;top:0;left:0;
-         opacity:0;transition:opacity 0.7s ease;}
-  .slide.active{display:block;opacity:1;}
-  .slide.fade-out{display:block;opacity:0;}
+  .stage{width:69%;height:100%;position:relative;overflow:hidden;background:#16233F;}
+  /* 한 번에 한 장만 보이도록 : 이전 화면이 완전히 사라진 뒤 다음 화면 등장 */
+  .slide{display:none;width:100%;height:100%;position:absolute;top:0;left:0;}
+  .slide.active{display:block;animation:fin 0.45s ease both;}
+  .slide.fade-out{display:block;animation:fout 0.3s ease forwards;}
   .slide.off{display:none !important;}
+  @keyframes fin{from{opacity:0;}to{opacity:1;}}
+  @keyframes fout{from{opacity:1;}to{opacity:0;}}
 
   .pane{width:100%;height:100%;position:relative;padding:7.5vh 7vh 8vh 7vh;
         display:flex;flex-direction:column;justify-content:center;}
@@ -71,9 +73,11 @@
   .dark .hbox{background:#22355A;border-left:1.1vh solid #4FD6B8;}
   .hb1{font-size:5.4vh;font-weight:800;letter-spacing:-0.24vh;line-height:1.35;}
   .hb2{font-size:3.8vh;color:#5A6B80;letter-spacing:-0.13vh;line-height:1.55;margin-top:2.2vh;}
+  .hb2 b{color:#16233F;font-weight:800;}
   .dark .hb2{color:#A9BAD4;}
+  .dark .hb2 b{color:#fff;}
 
-  /* 번호 항목 : 세로로 크게 두 개 */
+  /* 번호 항목 */
   .item{display:flex;align-items:flex-start;margin:3.4vh 0;}
   .num{flex:0 0 auto;width:8.4vh;height:8.4vh;border-radius:50%;background:#16233F;color:#fff;
        font-size:4.2vh;font-weight:800;display:flex;justify-content:center;align-items:center;
@@ -83,18 +87,30 @@
   .it2{font-size:4.2vh;color:#5A6B80;letter-spacing:-0.15vh;line-height:1.5;margin-top:1.6vh;}
   .dark .it2{color:#A9BAD4;}
 
-  /* 벌점 표 */
+  /* 표 */
   .row{display:flex;align-items:center;border-bottom:0.2vh solid #E2E7EC;padding:4.8vh 0;}
   .row:first-of-type{border-top:0.2vh solid #E2E7EC;}
   .rk{width:38%;font-size:5.8vh;font-weight:900;letter-spacing:-0.26vh;}
   .rv{width:62%;font-size:5.4vh;font-weight:700;color:#3A4A5F;letter-spacing:-0.24vh;}
 
-  /* 뉴스 */
-  .ntitle{font-size:7vh;font-weight:900;letter-spacing:-0.34vh;}
-  .nsub{font-size:3vh;color:#A9BAD4;letter-spacing:-0.1vh;margin-top:1.6vh;}
-  .nitem{border-left:0.8vh solid #2FB39A;padding:0.4vh 0 0.4vh 3vh;margin-top:4.4vh;}
-  .nh{font-size:4.6vh;font-weight:800;letter-spacing:-0.2vh;line-height:1.4;}
-  .nm{font-size:2.9vh;color:#94A6C6;letter-spacing:-0.08vh;margin-top:1.2vh;}
+  /* ============ 05 수능하루 전용 ============ */
+  .sched .row{padding:4.2vh 0;}
+  .sched .rk{width:34%;font-size:5.4vh;}
+  .sched .rv{width:66%;font-size:4.8vh;line-height:1.35;}
+  .sched .rv small{display:block;font-size:3vh;font-weight:600;color:#7A8A9E;margin-top:0.6vh;}
+  .sched .due .rk,.sched .due .rv{color:#2FB39A;}
+
+  .codebox{display:flex;align-items:center;}
+  .codebox .ck{font-size:3.6vh;font-weight:800;color:#2FB39A;letter-spacing:-0.1vh;
+               margin-right:4vh;line-height:1.4;}
+  .codebox .cv{font-size:15vh;font-weight:900;letter-spacing:1.2vh;line-height:1;color:#16233F;}
+
+  .qrwrap{display:flex;align-items:center;justify-content:space-between;}
+  .qrtext{flex:1 1 auto;padding-right:5vh;}
+  .qrurl{font-size:4vh;font-weight:800;color:#fff;letter-spacing:-0.12vh;margin-top:4.4vh;}
+  .qrleft{font-size:3.6vh;color:#A9BAD4;letter-spacing:-0.12vh;margin-top:2.4vh;}
+  .qrleft b{color:#4FD6B8;font-weight:900;}
+  .qrbox{flex:0 0 auto;width:44vh;height:44vh;background:#fff;padding:3.4vh;}
 
   .pb{position:absolute;bottom:0;left:0;height:0.8vh;
       background:linear-gradient(90deg,#2FB39A,#4FD6B8);width:0%;z-index:100;}
@@ -132,209 +148,94 @@
   </div>
 </div>
 
-<!-- 0-1. 오늘의 수능 소식 (news.json 이 있을 때만 표시) -->
-<div class="slide off" id="newsSlide">
-  <div class="pane dark">
-    <div class="eyebrow">오늘의 수능 소식</div>
-    <div class="ntitle anim" id="newsTitle">수능 뉴스</div>
-    <div class="nsub anim" id="newsUpdated">&nbsp;</div>
-    <div id="newsList"></div>
-  </div>
-</div>
+<!-- ================================================================
+     05 수능하루  (인사 화면 바로 다음에 나옵니다)
+       sh-reg   : 접수 기간(~ 9/21 13:00)에만 표시
+       sh-after : 접수 마감 후 ~ 10/17 까지 표시
+       10/18 부터는 모두 자동으로 빠집니다
+     ================================================================ -->
 
-<!-- ============ 01 전자기기 · 방화벽 ============ -->
-<div class="slide">
-  <div class="pane lite">
-    <div class="eyebrow">01 전자기기 · 방화벽</div>
-    <div class="hl anim">김엄마는<br><em>차단이 아니라</em><br><em>기준입니다</em></div>
+<!-- 05-1 리허설 -->
+<div class="slide sh-reg">
+  <div class="pane dark">
+    <div class="eyebrow">수능하루 · 접수 마감 <span class="shDday">D-5</span></div>
+    <div class="hl anim">수능하루는<br><em>수능 리허설입니다</em></div>
     <div class="hbox anim d2">
-      <div class="hb1">인강 앱은 해제 없이 상시 사용</div>
-      <div class="hb2">EBS · 이투스 · 메가스터디 · 대성마이맥 · 네이버 사전</div>
+      <div class="hb1">실제 학교 시험장에서, 수능과 똑같은 하루</div>
+      <div class="hb2">시대인재 전국 현장 모의고사 「서바이벌 PRO」</div>
     </div>
   </div>
 </div>
 
-<div class="slide">
+<!-- 05-2 재원생 혜택 -->
+<div class="slide sh-reg">
   <div class="pane lite">
-    <div class="eyebrow">01 전자기기 · 방화벽</div>
+    <div class="eyebrow">수능하루 · 재원생 혜택</div>
+    <div class="hl anim">재원생 응시료<br><em>10,000원 지원</em></div>
+    <div class="hbox anim d2">
+      <div class="codebox">
+        <div class="ck">지원<br>코드</div>
+        <div class="cv">1953</div>
+      </div>
+      <div class="hb2"><b>결제 전에</b> 신청 화면 「코드 입력」 칸에 입력하세요<br>결제 후에는 환급되지 않습니다</div>
+    </div>
+  </div>
+</div>
+
+<!-- 05-3 시험 일정 -->
+<div class="slide sh-reg">
+  <div class="pane lite sched">
+    <div class="eyebrow">수능하루 · 시험 일정</div>
+    <div class="row anim"><div class="rk">10. 9 (금)</div><div class="rv">인천 옥련중 · 서울 휘문중<small>옥련중 450석 · 휘문중 850석</small></div></div>
+    <div class="row anim d2"><div class="rk">10. 17 (토)</div><div class="rv">인천 옥련중</div></div>
+    <div class="row anim d3 due"><div class="rk">접수 마감</div><div class="rv">9. 21 (월) 오후 1시<small>좌석이 차면 일찍 마감됩니다</small></div></div>
+  </div>
+</div>
+
+<!-- 05-4 무엇이 다른가 -->
+<div class="slide sh-reg">
+  <div class="pane lite">
+    <div class="eyebrow">수능하루 · 무엇이 다른가</div>
     <div class="item anim">
       <div class="num">1</div>
       <div>
-        <div class="it1">영상 시청 — 일 최대 3시간</div>
-        <div class="it2">복습 영상 · 녹화 강의, 출처 정확히 기재</div>
+        <div class="it1">현직 교사가 직접 감독</div>
+        <div class="it2">수험표 · 신원 확인부터 종료까지 실제 수능 절차<br>수능용 샤프 · 컴퓨터용 사인펜 제공</div>
       </div>
     </div>
     <div class="item anim d2">
       <div class="num">2</div>
       <div>
-        <div class="it1">질의응답 — 회당 30분</div>
-        <div class="it2">더 필요하면 원장선생님께 별도 요청</div>
+        <div class="it1">전국 단위 성적 분석</div>
+        <div class="it2">시대인재C 「서프 포스트」에서<br>등급컷 · 표준점수 · 백분위 확인</div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="slide">
-  <div class="pane lite">
-    <div class="eyebrow">01 전자기기 · 방화벽</div>
-    <div class="item anim">
-      <div class="num">3</div>
-      <div>
-        <div class="it1">다운로드 — 해제 사유 불가</div>
-        <div class="it2">점심 · 저녁 시간을 이용합니다</div>
-      </div>
-    </div>
-    <div class="item anim d2">
-      <div class="num">4</div>
-      <div>
-        <div class="it1">어기면 벌점 10점</div>
-        <div class="it2">학습 외 사용, SNS 앱 미삭제, 사유 외 목적 사용</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ 02 스터디 플래너 ============ -->
-<div class="slide">
-  <div class="pane lite">
-    <div class="eyebrow">02 스터디 플래너</div>
-    <div class="hl anim">김엄마는<br><em>플래너입니다</em></div>
-    <div class="hbox anim d2">
-      <div class="hb1">계획 세우는 법부터 가르칩니다</div>
-      <div class="hb2">멘토 선생님께 주간 · 일일 계획 작성법을 먼저 배웁니다</div>
-    </div>
-  </div>
-</div>
-
-<div class="slide">
-  <div class="pane lite">
-    <div class="eyebrow">02 스터디 플래너</div>
-    <div class="item anim">
-      <div class="num">1</div>
-      <div>
-        <div class="it1">매일 검사, 예약제</div>
-        <div class="it2">수능선배 앱으로 검사 시간을 직접 예약 · 시간당 최대 20명</div>
-      </div>
-    </div>
-    <div class="item anim d2">
-      <div class="num">2</div>
-      <div>
-        <div class="it1">검사 방법은 두 가지</div>
-        <div class="it2">직접 넘기며 받거나, 책상 위에 펴서 쌓아두기</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="slide">
-  <div class="pane lite">
-    <div class="eyebrow">02 스터디 플래너</div>
-    <div class="item anim">
-      <div class="num">3</div>
-      <div>
-        <div class="it1">안 하면 벌점</div>
-        <div class="it2">일일 미검사 3점 · 주간 미제출 5점</div>
-      </div>
-    </div>
-    <div class="item anim d2">
-      <div class="num">4</div>
-      <div>
-        <div class="it1">시험 기간엔 조정 가능</div>
-        <div class="it2">보충수업이 많으면 검사 일시 중지</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ 03 상벌점 · 캐시백 ============ -->
-<div class="slide">
-  <div class="pane lite">
-    <div class="eyebrow">03 상벌점 · 캐시백</div>
-    <div class="hl anim">김엄마는<br><em>잔소리이자</em><br><em>용돈입니다</em></div>
-    <div class="hbox anim d2">
-      <div class="hb1">상점 100점 = 현금 1,000원</div>
-      <div class="hb2">재원 3개월 이상 · 연 2회 지급 (7월 · 11월)</div>
-    </div>
-  </div>
-</div>
-
-<div class="slide">
-  <div class="pane lite">
-    <div class="eyebrow">03 상벌점 · 캐시백</div>
-    <div class="row anim"><div class="rk">벌점 20점</div><div class="rv">의무 자습 연장</div></div>
-    <div class="row anim d2"><div class="rk">벌점 30점</div><div class="rv">경고 및 학부모 연락</div></div>
-    <div class="row anim d3"><div class="rk">벌점 45점</div><div class="rv">강제 퇴원</div></div>
-  </div>
-</div>
-
-<div class="slide">
-  <div class="pane lite">
-    <div class="eyebrow">03 상벌점 · 캐시백</div>
-    <div class="item anim">
-      <div class="num">+</div>
-      <div>
-        <div class="it1">의무자습 외 추가 상점</div>
-        <div class="it2">재학생 평일 24시 이후 · 주말 22시 이후 시간당 2점<br>재수생 일요일 자율학습 시간당 1점</div>
-      </div>
-    </div>
-    <div class="item anim d2">
-      <div class="num">−</div>
-      <div>
-        <div class="it1">벌점 상쇄는 2배</div>
-        <div class="it2">벌점 10점을 지우려면 상점 20점</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ 04 학부모님께 ============ -->
-<div class="slide">
+<!-- 05-5 지금 접수 (QR) -->
+<div class="slide sh-reg">
   <div class="pane dark">
-    <div class="eyebrow">04 학부모님께</div>
-    <div class="hl anim">김엄마는<br><em>기록입니다</em></div>
+    <div class="eyebrow">수능하루 · 지금 접수</div>
+    <div class="qrwrap">
+      <div class="qrtext">
+        <div class="hl anim">휴대폰으로<br><em>바로 접수</em></div>
+        <div class="qrurl anim d2">www.suneungharu.co.kr</div>
+        <div class="qrleft anim d2">마감까지 <b class="shLeft">-</b> 남았습니다</div>
+      </div>
+      <div class="qrbox anim d3"><svg width="100%" height="100%" version="1.1" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><path fill="#16233F" d="M0,0H1V1H0zM1,0H2V1H1zM2,0H3V1H2zM3,0H4V1H3zM4,0H5V1H4zM5,0H6V1H5zM6,0H7V1H6zM8,0H9V1H8zM9,0H10V1H9zM10,0H11V1H10zM11,0H12V1H11zM15,0H16V1H15zM16,0H17V1H16zM19,0H20V1H19zM20,0H21V1H20zM22,0H23V1H22zM23,0H24V1H23zM24,0H25V1H24zM25,0H26V1H25zM26,0H27V1H26zM27,0H28V1H27zM28,0H29V1H28zM0,1H1V2H0zM6,1H7V2H6zM8,1H9V2H8zM10,1H11V2H10zM12,1H13V2H12zM14,1H15V2H14zM15,1H16V2H15zM17,1H18V2H17zM18,1H19V2H18zM20,1H21V2H20zM22,1H23V2H22zM28,1H29V2H28zM0,2H1V3H0zM2,2H3V3H2zM3,2H4V3H3zM4,2H5V3H4zM6,2H7V3H6zM9,2H10V3H9zM11,2H12V3H11zM12,2H13V3H12zM13,2H14V3H13zM14,2H15V3H14zM15,2H16V3H15zM18,2H19V3H18zM22,2H23V3H22zM24,2H25V3H24zM25,2H26V3H25zM26,2H27V3H26zM28,2H29V3H28zM0,3H1V4H0zM2,3H3V4H2zM3,3H4V4H3zM4,3H5V4H4zM6,3H7V4H6zM8,3H9V4H8zM11,3H12V4H11zM16,3H17V4H16zM17,3H18V4H17zM18,3H19V4H18zM20,3H21V4H20zM22,3H23V4H22zM24,3H25V4H24zM25,3H26V4H25zM26,3H27V4H26zM28,3H29V4H28zM0,4H1V5H0zM2,4H3V5H2zM3,4H4V5H3zM4,4H5V5H4zM6,4H7V5H6zM9,4H10V5H9zM12,4H13V5H12zM13,4H14V5H13zM19,4H20V5H19zM22,4H23V5H22zM24,4H25V5H24zM25,4H26V5H25zM26,4H27V5H26zM28,4H29V5H28zM0,5H1V6H0zM6,5H7V6H6zM11,5H12V6H11zM14,5H15V6H14zM17,5H18V6H17zM18,5H19V6H18zM19,5H20V6H19zM20,5H21V6H20zM22,5H23V6H22zM28,5H29V6H28zM0,6H1V7H0zM1,6H2V7H1zM2,6H3V7H2zM3,6H4V7H3zM4,6H5V7H4zM5,6H6V7H5zM6,6H7V7H6zM8,6H9V7H8zM10,6H11V7H10zM12,6H13V7H12zM14,6H15V7H14zM16,6H17V7H16zM18,6H19V7H18zM20,6H21V7H20zM22,6H23V7H22zM23,6H24V7H23zM24,6H25V7H24zM25,6H26V7H25zM26,6H27V7H26zM27,6H28V7H27zM28,6H29V7H28zM8,7H9V8H8zM10,7H11V8H10zM12,7H13V8H12zM13,7H14V8H13zM14,7H15V8H14zM17,7H18V8H17zM20,7H21V8H20zM0,8H1V9H0zM2,8H3V9H2zM3,8H4V9H3zM5,8H6V9H5zM6,8H7V9H6zM7,8H8V9H7zM11,8H12V9H11zM12,8H13V9H12zM13,8H14V9H13zM14,8H15V9H14zM16,8H17V9H16zM17,8H18V9H17zM18,8H19V9H18zM19,8H20V9H19zM22,8H23V9H22zM25,8H26V9H25zM27,8H28V9H27zM28,8H29V9H28zM0,9H1V10H0zM1,9H2V10H1zM3,9H4V10H3zM5,9H6V10H5zM7,9H8V10H7zM9,9H10V10H9zM12,9H13V10H12zM15,9H16V10H15zM16,9H17V10H16zM18,9H19V10H18zM19,9H20V10H19zM20,9H21V10H20zM22,9H23V10H22zM23,9H24V10H23zM24,9H25V10H24zM28,9H29V10H28zM2,10H3V11H2zM3,10H4V11H3zM4,10H5V11H4zM5,10H6V11H5zM6,10H7V11H6zM9,10H10V11H9zM10,10H11V11H10zM12,10H13V11H12zM14,10H15V11H14zM15,10H16V11H15zM20,10H21V11H20zM23,10H24V11H23zM24,10H25V11H24zM26,10H27V11H26zM27,10H28V11H27zM2,11H3V12H2zM4,11H5V12H4zM8,11H9V12H8zM9,11H10V12H9zM10,11H11V12H10zM11,11H12V12H11zM13,11H14V12H13zM14,11H15V12H14zM15,11H16V12H15zM18,11H19V12H18zM19,11H20V12H19zM21,11H22V12H21zM23,11H24V12H23zM24,11H25V12H24zM28,11H29V12H28zM4,12H5V13H4zM6,12H7V13H6zM7,12H8V13H7zM8,12H9V13H8zM11,12H12V13H11zM16,12H17V13H16zM17,12H18V13H17zM19,12H20V13H19zM25,12H26V13H25zM26,12H27V13H26zM2,13H3V14H2zM3,13H4V14H3zM5,13H6V14H5zM7,13H8V14H7zM9,13H10V14H9zM11,13H12V14H11zM12,13H13V14H12zM13,13H14V14H13zM19,13H20V14H19zM21,13H22V14H21zM22,13H23V14H22zM23,13H24V14H23zM26,13H27V14H26zM27,13H28V14H27zM28,13H29V14H28zM1,14H2V15H1zM3,14H4V15H3zM5,14H6V15H5zM6,14H7V15H6zM8,14H9V15H8zM14,14H15V15H14zM17,14H18V15H17zM18,14H19V15H18zM19,14H20V15H19zM20,14H21V15H20zM21,14H22V15H21zM22,14H23V15H22zM23,14H24V15H23zM24,14H25V15H24zM26,14H27V15H26zM27,14H28V15H27zM28,14H29V15H28zM0,15H1V16H0zM3,15H4V16H3zM8,15H9V16H8zM11,15H12V16H11zM13,15H14V16H13zM15,15H16V16H15zM19,15H20V16H19zM20,15H21V16H20zM23,15H24V16H23zM24,15H25V16H24zM27,15H28V16H27zM0,16H1V17H0zM1,16H2V17H1zM2,16H3V17H2zM4,16H5V17H4zM5,16H6V17H5zM6,16H7V17H6zM7,16H8V17H7zM9,16H10V17H9zM10,16H11V17H10zM20,16H21V17H20zM21,16H22V17H21zM24,16H25V17H24zM25,16H26V17H25zM27,16H28V17H27zM3,17H4V18H3zM4,17H5V18H4zM7,17H8V18H7zM8,17H9V18H8zM13,17H14V18H13zM17,17H18V18H17zM20,17H21V18H20zM23,17H24V18H23zM25,17H26V18H25zM26,17H27V18H26zM27,17H28V18H27zM0,18H1V19H0zM6,18H7V19H6zM7,18H8V19H7zM8,18H9V19H8zM10,18H11V19H10zM12,18H13V19H12zM17,18H18V19H17zM22,18H23V19H22zM23,18H24V19H23zM26,18H27V19H26zM3,19H4V20H3zM4,19H5V20H4zM8,19H9V20H8zM15,19H16V20H15zM16,19H17V20H16zM17,19H18V20H17zM19,19H20V20H19zM22,19H23V20H22zM26,19H27V20H26zM1,20H2V21H1zM2,20H3V21H2zM4,20H5V21H4zM5,20H6V21H5zM6,20H7V21H6zM11,20H12V21H11zM12,20H13V21H12zM13,20H14V21H13zM15,20H16V21H15zM17,20H18V21H17zM18,20H19V21H18zM20,20H21V21H20zM21,20H22V21H21zM22,20H23V21H22zM23,20H24V21H23zM24,20H25V21H24zM25,20H26V21H25zM26,20H27V21H26zM8,21H9V22H8zM9,21H10V22H9zM11,21H12V22H11zM12,21H13V22H12zM13,21H14V22H13zM14,21H15V22H14zM15,21H16V22H15zM17,21H18V22H17zM18,21H19V22H18zM20,21H21V22H20zM24,21H25V22H24zM25,21H26V22H25zM26,21H27V22H26zM27,21H28V22H27zM28,21H29V22H28zM0,22H1V23H0zM1,22H2V23H1zM2,22H3V23H2zM3,22H4V23H3zM4,22H5V23H4zM5,22H6V23H5zM6,22H7V23H6zM8,22H9V23H8zM9,22H10V23H9zM10,22H11V23H10zM11,22H12V23H11zM12,22H13V23H12zM13,22H14V23H13zM16,22H17V23H16zM19,22H20V23H19zM20,22H21V23H20zM22,22H23V23H22zM24,22H25V23H24zM25,22H26V23H25zM27,22H28V23H27zM0,23H1V24H0zM6,23H7V24H6zM8,23H9V24H8zM9,23H10V24H9zM10,23H11V24H10zM11,23H12V24H11zM16,23H17V24H16zM18,23H19V24H18zM20,23H21V24H20zM24,23H25V24H24zM25,23H26V24H25zM27,23H28V24H27zM28,23H29V24H28zM0,24H1V25H0zM2,24H3V25H2zM3,24H4V25H3zM4,24H5V25H4zM6,24H7V25H6zM9,24H10V25H9zM11,24H12V25H11zM12,24H13V25H12zM14,24H15V25H14zM15,24H16V25H15zM17,24H18V25H17zM20,24H21V25H20zM21,24H22V25H21zM22,24H23V25H22zM23,24H24V25H23zM24,24H25V25H24zM26,24H27V25H26zM28,24H29V25H28zM0,25H1V26H0zM2,25H3V26H2zM3,25H4V26H3zM4,25H5V26H4zM6,25H7V26H6zM8,25H9V26H8zM9,25H10V26H9zM10,25H11V26H10zM14,25H15V26H14zM16,25H17V26H16zM17,25H18V26H17zM18,25H19V26H18zM19,25H20V26H19zM20,25H21V26H20zM21,25H22V26H21zM24,25H25V26H24zM25,25H26V26H25zM27,25H28V26H27zM0,26H1V27H0zM2,26H3V27H2zM3,26H4V27H3zM4,26H5V27H4zM6,26H7V27H6zM8,26H9V27H8zM9,26H10V27H9zM11,26H12V27H11zM12,26H13V27H12zM13,26H14V27H13zM15,26H16V27H15zM16,26H17V27H16zM17,26H18V27H17zM23,26H24V27H23zM26,26H27V27H26zM28,26H29V27H28zM0,27H1V28H0zM6,27H7V28H6zM9,27H10V28H9zM10,27H11V28H10zM11,27H12V28H11zM16,27H17V28H16zM18,27H19V28H18zM19,27H20V28H19zM20,27H21V28H20zM23,27H24V28H23zM25,27H26V28H25zM27,27H28V28H27zM0,28H1V29H0zM1,28H2V29H1zM2,28H3V29H2zM3,28H4V29H3zM4,28H5V29H4zM5,28H6V29H5zM6,28H7V29H6zM8,28H9V29H8zM9,28H10V29H9zM13,28H14V29H13zM14,28H15V29H14zM15,28H16V29H15zM17,28H18V29H17zM19,28H20V29H19zM20,28H21V29H20zM21,28H22V29H21zM25,28H26V29H25zM27,28H28V29H27z" id="qr-path" fill="#000000" fill-opacity="1" fill-rule="nonzero" stroke="none"/></svg></div>
+    </div>
+  </div>
+</div>
+
+<!-- 05-6 응시생 안내 (접수 마감 후) -->
+<div class="slide sh-after">
+  <div class="pane dark">
+    <div class="eyebrow">수능하루 · 응시생 안내</div>
+    <div class="hl anim"><span id="shNext">10월 9일 (금)</span><br><em>수능하루 응시생</em></div>
     <div class="hbox anim d2">
-      <div class="hb1">추측하지 않으셔도 됩니다</div>
-      <div class="hb2">모든 출입과 사유가 앱에 남습니다</div>
-    </div>
-  </div>
-</div>
-
-<div class="slide">
-  <div class="pane dark">
-    <div class="eyebrow">04 학부모님께</div>
-    <div class="item anim">
-      <div class="num">1</div>
-      <div>
-        <div class="it1">턴게이트 출입 기록</div>
-        <div class="it2">등 · 하원과 외출이 통과 시각으로 남습니다</div>
-      </div>
-    </div>
-    <div class="item anim d2">
-      <div class="num">2</div>
-      <div>
-        <div class="it1">사유 제출 24시간 내 승인</div>
-        <div class="it2">지각 · 외출 · 결석은 학부모 승인이 있어야 처리</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="slide">
-  <div class="pane dark">
-    <div class="eyebrow">04 학부모님께</div>
-    <div class="item anim">
-      <div class="num">3</div>
-      <div>
-        <div class="it1">학부모 직접 제출 가능</div>
-        <div class="it2">수능선배 앱에서 바로 사유 입력</div>
-      </div>
-    </div>
-    <div class="item anim d2">
-      <div class="num">4</div>
-      <div>
-        <div class="it1">벌점 30점 초과 시 연락</div>
-        <div class="it2">개별 경고와 함께 학부모님께 안내</div>
-      </div>
+      <div class="hb1">오전 8시 10분까지 입실하세요</div>
+      <div class="hb2"><span id="shPlace">인천 옥련중 · 서울 휘문중</span><br>신분증 · 수험표 지참, 전자기기는 입실 때 제출</div>
     </div>
   </div>
 </div>
@@ -364,6 +265,52 @@ function updateDday(){
 }
 
 /* ================================================================
+   1-2) 수능하루 기간 설정  ─ 날짜가 바뀌면 여기만 고치세요 (월은 0부터)
+   ================================================================ */
+var SH_DEADLINE  = new Date(2026, 8, 21, 13, 0);  // 접수 마감 9/21 13:00
+var SH_EXAM1_END = new Date(2026, 9, 10, 0, 0);   // 10/9 시험이 끝난 뒤
+var SH_END       = new Date(2026, 9, 18, 0, 0);   // 10/18 부터 화면에서 뺌
+
+function shPhase(){
+  var n = new Date();
+  if (n < SH_DEADLINE) return 'reg';
+  if (n < SH_END) return 'after';
+  return 'none';
+}
+var SH_START_PHASE = shPhase();
+
+(function(){
+  var reg = document.querySelectorAll('.sh-reg'), aft = document.querySelectorAll('.sh-after'), i;
+  for (i = 0; i < reg.length; i++) if (SH_START_PHASE !== 'reg')   reg[i].className += ' off';
+  for (i = 0; i < aft.length; i++) if (SH_START_PHASE !== 'after') aft[i].className += ' off';
+})();
+
+function setAll(cls, html){
+  var e = document.getElementsByClassName(cls);
+  for (var i = 0; i < e.length; i++) e[i].innerHTML = html;
+}
+function updateSH(){
+  var now = new Date();
+  if (shPhase() !== SH_START_PHASE){ location.reload(); return; }
+
+  if (SH_START_PHASE === 'reg'){
+    var t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var t1 = new Date(SH_DEADLINE.getFullYear(), SH_DEADLINE.getMonth(), SH_DEADLINE.getDate());
+    var dd = Math.round((t1 - t0) / 86400000);
+    setAll('shDday', dd > 0 ? 'D-' + dd : 'D-DAY');
+
+    var m = Math.max(0, Math.floor((SH_DEADLINE - now) / 60000));
+    var d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mi = m % 60;
+    setAll('shLeft', (d ? d + '일 ' : '') + (d || h ? h + '시간 ' : '') + mi + '분');
+  }
+  if (SH_START_PHASE === 'after'){
+    var first = now < SH_EXAM1_END;
+    document.getElementById('shNext').innerHTML  = first ? '10월 9일 (금)' : '10월 17일 (토)';
+    document.getElementById('shPlace').innerHTML = first ? '인천 옥련중 · 서울 휘문중' : '인천 옥련중';
+  }
+}
+
+/* ================================================================
    2) 실시간 시계
    ================================================================ */
 var DAYS = ['일','월','화','수','목','금','토'];
@@ -374,55 +321,16 @@ function updateClock(){
   document.getElementById('cdate').innerHTML =
       n.getFullYear() + '. ' + (n.getMonth()+1) + '. ' + n.getDate() + ' (' + DAYS[n.getDay()] + ')';
   updateDday();
+  updateSH();
 }
 updateClock();
 setInterval(updateClock, 10000);
 
 /* ================================================================
-   3) 오늘의 수능 소식
-      같은 폴더의 news.json 을 읽습니다. (GitHub Actions 가 매일 새로 씀)
-      파일이 없거나 비어 있으면 이 슬라이드는 자동으로 건너뜁니다.
-   ================================================================ */
-var NEWS_MAX = 3;   // 한 화면에 보여줄 기사 수
-
-function loadNews(done){
-  var x = new XMLHttpRequest();
-  var url = 'news.json?t=' + (new Date()).getTime();
-  var finished = false;
-  function finish(){ if(!finished){ finished = true; done(); } }
-  setTimeout(finish, 4000);                 // 4초 안에 응답 없으면 그냥 진행
-  x.onreadystatechange = function(){
-    if (x.readyState !== 4) return;
-    try{
-      if (x.status >= 200 && x.status < 300){
-        var data  = JSON.parse(x.responseText);
-        var items = data.items || [];
-        if (items.length){
-          var box = document.getElementById('newsList'), html = '';
-          for (var i = 0; i < items.length && i < NEWS_MAX; i++){
-            var cls = (i === 0) ? 'nitem anim d2' : 'nitem anim d3';
-            html += '<div class="' + cls + '"><div class="nh">' + items[i].title + '</div>' +
-                    '<div class="nm">' + (items[i].source || '') +
-                    (items[i].date ? ' · ' + items[i].date : '') + '</div></div>';
-          }
-          box.innerHTML = html;
-          document.getElementById('newsTitle').innerHTML = '오늘 이런 소식이 있었습니다';
-          document.getElementById('newsUpdated').innerHTML =
-              (data.updated ? data.updated + ' 기준' : '') + ' · 수능 관련 뉴스';
-          document.getElementById('newsSlide').className = 'slide';   // off 해제
-        }
-      }
-    }catch(e){}
-    finish();
-  };
-  try{ x.open('GET', url, true); x.send(); }catch(e){ finish(); }
-}
-
-/* ================================================================
    4) 슬라이드쇼   DUR = 한 장당 시간 (7000 = 7초)
    ================================================================ */
 var DUR = 7000;
-var S, T, c = 0, tm = null;
+var S, T, c = 0, tm = null, swapT = null;
 var pb = document.getElementById('pb'), dotBox = document.getElementById('dots');
 
 function buildDots(){
@@ -437,13 +345,20 @@ function markDots(){
   }
 }
 function show(n){
+  if (T < 2) return;
   var p = c;
   c = ((n % T) + T) % T;
-  S[p].className = 'slide fade-out';
-  setTimeout(function(){ S[p].className = 'slide'; }, 120);
-  S[c].className = 'slide active';
+  clearTimeout(swapT);
+  var wasShown = S[p].className.indexOf('active') >= 0;
+  for (var i = 0; i < T; i++) if (i !== p) S[i].className = 'slide';
   markDots();
-  prog();
+  function swap(){
+    S[p].className = 'slide';
+    S[c].className = 'slide active';
+    prog();
+  }
+  if (wasShown){ S[p].className = 'slide fade-out'; swapT = setTimeout(swap, 300); }
+  else { swap(); }
 }
 function prog(){
   pb.style.transition = 'none';
@@ -458,6 +373,7 @@ function prog(){
 function start(){
   S = document.querySelectorAll('.slide:not(.off)');
   T = S.length;
+  if (T < 2){ pb.style.display = 'none'; dotBox.style.display = 'none'; return; }
   buildDots();
   markDots();
   prog();
@@ -467,13 +383,8 @@ document.addEventListener('keydown', function(e){
   if (e.key === 'ArrowLeft'){ clearTimeout(tm); show(c - 1); }
 });
 
-loadNews(start);   // 뉴스 확인이 끝난 뒤 슬라이드 시작
+start();
 
-/* 새벽 4시에 페이지를 새로 고쳐 뉴스를 갱신합니다 */
-setInterval(function(){
-  var n = new Date();
-  if (n.getHours() === 4 && n.getMinutes() === 0) location.reload();
-}, 60000);
 </script>
 </body>
 </html>
